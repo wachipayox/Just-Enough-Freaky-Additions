@@ -26,8 +26,6 @@ import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 
-import java.util.List;
-
 public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
     public static final RecipeType<PiglinTrade> recipeType = RecipeType.create(JEFA.MODID, "piglin_trade", PiglinTrade.class);
@@ -47,18 +45,28 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
     }
 
     @Override
+    public int getGridX() {
+        return 73;
+    }
+
+    @Override
+    public int getGridY() {
+        return 5;
+    }
+
+    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PiglinTrade recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).addIngredient(
                 VanillaTypes.ITEM_STACK,
                 Items.GOLD_INGOT.getDefaultInstance()
         );
-        scrollGridFactory.setPosition(73, 5);
 
-        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.PIGLIN_BARTERING.location()).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
-        for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.PIGLIN_BARTERING.location())
+                .stream().map(LootEntryPreviewBuilder.PreviewResult::stack)
+                .toList()) {
+            builder.addOutputSlot().addItemStack(itemStack);
         }
+
     }
 
     @Override
@@ -109,5 +117,4 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
         poseStack.popPose();
     }
-
 }

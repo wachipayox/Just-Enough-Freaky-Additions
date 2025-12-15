@@ -3,12 +3,10 @@ package com.wachi.jefa.cat_gift;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.library.gui.elements.DrawableBuilder;
 import net.minecraft.network.chat.Component;
@@ -18,8 +16,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
 
@@ -40,6 +36,16 @@ public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
     }
 
     @Override
+    public int getGridX() {
+        return 3;
+    }
+
+    @Override
+    public int getGridY() {
+        return 4;
+    }
+
+    @Override
     public @Nullable IDrawable getIcon() {
         return icon2;
     }
@@ -51,14 +57,10 @@ public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, CatGift recipe, IFocusGroup focuses) {
-        scrollGridFactory.setPosition(3, 4);
-
-        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
+        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 BuiltInLootTables.CAT_MORNING_GIFT.location()
-        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
-        for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
+            builder.addOutputSlot().addItemStack(itemStack);
         }
     }
 }

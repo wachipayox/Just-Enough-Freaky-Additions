@@ -1,7 +1,5 @@
 package com.wachi.jefa.hero_of_the_village;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
@@ -14,51 +12,27 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.common.gui.elements.DrawableBlank;
-import mezz.jei.common.gui.elements.DrawableSprite;
-import mezz.jei.common.gui.textures.JeiSpriteUploader;
 import mezz.jei.library.gui.elements.DrawableBuilder;
-import mezz.jei.library.runtime.JeiHelpers;
-import mezz.jei.library.runtime.JeiRuntime;
-import mezz.jei.neoforge.JustEnoughItems;
-import mezz.jei.neoforge.JustEnoughItemsClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
-
-import java.util.List;
 
 public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
     public static final RecipeType<HeroLootRecipe> recipeType = RecipeType.create(JEFA.MODID, "hero_loot", HeroLootRecipe.class);
-
-    protected final IDrawable background2;
     protected final IDrawable icon2;
 
     public HeroLootCategory(IGuiHelper guiHelper){
-        super(guiHelper, Items.EMERALD.getDefaultInstance(), 8, 200, 100, 1);
-        background2 = new DrawableBuilder(ResourceLocation.fromNamespaceAndPath(
-                JEFA.MODID, "textures/gui/bg.png"
-        ), 0, 0, 200, 24).setTextureSize(100, 24).build();
+        super(guiHelper, Items.EMERALD.getDefaultInstance(), 8, 200, 24, 1);
 
         icon2 = new DrawableBuilder(
                 ResourceLocation.parse(
@@ -67,13 +41,18 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
     }
 
     @Override
-    public @Nullable IDrawable getIcon() {
-        return icon2;
+    public int getGridX() {
+        return 36;
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background2;
+    public int getGridY() {
+        return 4;
+    }
+
+    @Override
+    public @Nullable IDrawable getIcon() {
+        return icon2;
     }
 
     @Override
@@ -92,15 +71,13 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
                 VanillaTypes.ITEM_STACK,
                 recipe.workSite().matchingStates().stream().map(bs -> bs.getBlock().asItem().getDefaultInstance()).toList()
         );
-        scrollGridFactory.setPosition(36, 4);
 
-        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
+        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 recipe.giftsTable().location()
-        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
-        for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
+            builder.addOutputSlot().addItemStack(itemStack);
         }
+
     }
 
     @Override

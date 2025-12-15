@@ -29,6 +29,8 @@ import java.util.List;
 @JeiPlugin
 public class JefaPlugin implements IModPlugin {
 
+    public JefaPlugin(){}
+
     @Override
     public @NotNull ResourceLocation getPluginUid() {
         return ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "jei_plugin");
@@ -38,7 +40,7 @@ public class JefaPlugin implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registration) {
         var guiHelper = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(
-                new PiglinTradeCategory(registration.getJeiHelpers().getGuiHelper()),
+                new PiglinTradeCategory(guiHelper),
                 new VaultOpeningCategory(guiHelper),
                 new TrialSpawnerCategory(guiHelper),
                 new FishingCategory(guiHelper),

@@ -26,7 +26,7 @@ import org.joml.Quaternionf;
 
 public class MobInteractionCategory implements IRecipeCategory<MobInteractionRecipe> {
 
-    public static final RecipeType<MobInteractionRecipe> recipeType = RecipeType.create(JEFA.MODID, "mob_interaction", com.wachi.jefa.mob_interaction.MobInteractionRecipe.class);
+    public static final RecipeType<MobInteractionRecipe> recipeType = RecipeType.create(JEFA.MODID, "mob_interaction", MobInteractionRecipe.class);
 
     protected final IDrawable background;
     protected final IDrawable icon;
@@ -41,6 +41,16 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
     }
 
     @Override
+    public int getWidth() {
+        return 100;
+    }
+
+    @Override
+    public int getHeight() {
+        return 24;
+    }
+
+    @Override
     public RecipeType<MobInteractionRecipe> getRecipeType() {
         return recipeType;
     }
@@ -48,11 +58,6 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
     @Override
     public @NotNull Component getTitle() {
         return Component.translatable("jefa.category.mob_interaction");
-    }
-
-    @Override
-    public IDrawable getBackground() {
-        return background;
     }
 
     @Override
@@ -81,6 +86,9 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
     @Override
     public void draw(MobInteractionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         IRecipeCategory.super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+
+        background.draw(guiGraphics);
+
         if(Minecraft.getInstance().level == null) return;
 
         if(recipe.mobIn() != null) {

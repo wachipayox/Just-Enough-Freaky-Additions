@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TrialSpawnerCategory extends AbstractJefaCategory<TrialSpawnerLoot> {
 
@@ -40,6 +39,16 @@ public class TrialSpawnerCategory extends AbstractJefaCategory<TrialSpawnerLoot>
     }
 
     @Override
+    public int getGridX() {
+        return 73;
+    }
+
+    @Override
+    public int getGridY() {
+        return 5;
+    }
+
+    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, TrialSpawnerLoot recipe, IFocusGroup focuses) {
         if(recipe.ominous())
             builder.addSlot(RecipeIngredientRole.INPUT, 10, 13)
@@ -51,16 +60,12 @@ public class TrialSpawnerCategory extends AbstractJefaCategory<TrialSpawnerLoot>
                                     potion.set(DataComponents.OMINOUS_BOTTLE_AMPLIFIER, f);
                                     add(potion);}}});
 
-        scrollGridFactory.setPosition(73, 5);
-
-        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
+        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 recipe.ominous()
                         ? JefaLootTables.TRIAL_SPAWNER_OMINOUS.location()
                         : JefaLootTables.TRIAL_SPAWNER.location()
-        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
-        for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
+            builder.addOutputSlot().addItemStack(itemStack);
         }
     }
 

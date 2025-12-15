@@ -21,8 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
 
     public static final RecipeType<VaultLoot> recipeType = RecipeType.create(JEFA.MODID, "vault_loot", VaultLoot.class);
@@ -42,6 +40,16 @@ public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
     }
 
     @Override
+    public int getGridX() {
+        return 73;
+    }
+
+    @Override
+    public int getGridY() {
+        return 5;
+    }
+
+    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, VaultLoot recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).addIngredient(
                 VanillaTypes.ITEM_STACK,
@@ -49,16 +57,13 @@ public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
                         ? Items.OMINOUS_TRIAL_KEY.getDefaultInstance()
                         : Items.TRIAL_KEY.getDefaultInstance()
         );
-        scrollGridFactory.setPosition(73, 5);
 
-        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
+        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 recipe.ominous()
                         ? BuiltInLootTables.TRIAL_CHAMBERS_REWARD_OMINOUS.location()
                         : BuiltInLootTables.TRIAL_CHAMBERS_REWARD.location()
-        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
-        for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
+            builder.addOutputSlot().addItemStack(itemStack);
         }
     }
 
@@ -70,4 +75,5 @@ public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
 
         RenderUtil.renderBlockInGui(guiGraphics, bS, 12, 70, 35);
     }
+
 }

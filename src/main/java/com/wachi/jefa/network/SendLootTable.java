@@ -16,7 +16,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber()
 public record SendLootTable(ResourceKey<LootTable> id, String json) implements CustomPacketPayload {
 
     public static final Type<SendLootTable> TYPE = new Type<>(
