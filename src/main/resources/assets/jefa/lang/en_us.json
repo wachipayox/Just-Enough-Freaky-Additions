@@ -1,0 +1,23 @@
+{
+  "jefa.category.piglin_trade": "Piglin Bartering",
+  "jefa.category.vault_loot": "Vault Looting",
+  "jefa.category.trial_spawner_loot": "Trial Spawner Looting",
+  "jefa.category.cat_gift": "Cat Morning Gift",
+
+  "jefa.lore.chance": "Chance",
+  "jefa.lore.unknown_loot_function" : "Loot table is applying item data modifiers that the mod doesn't read",
+  "jefa.lore.damaged": "Item may be damaged",
+  "jefa.lore.enchantment.random_level": "random level",
+  "jefa.lore.enchantment.add": "may have more enchantments",
+  "jefa.lore.quantity.random": "Random quantity",
+  "jefa.lore.quantity": "Quantity",
+  "jefa.lore.enchantment.random": "Random enchantment",
+  "jefa.lore.enchantment.level": "level",
+  "jefa.lore.enchantment.random_valid": "any valid",
+  "jefa.lore.literal.between": "between",
+  "jefa.lore.ominous_amplifier": "Ominous potion effect",
+  "jefa.category.fishing_loot": "Fishing Loot (No Luck of the Sea)",
+  "jefa.lore.enchantment.max_level": "max level",
+  "jefa.category.mob_interaction": "Mob Interaction",
+  "jefa.category.hero_loot": "Hero of the Village Gifts"
+}

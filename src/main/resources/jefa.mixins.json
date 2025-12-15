@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "com.wachi.jefa.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "NestedLootTableAccessorMixin",
+    "LootPoolAccessorMixin",
+    "LootTableAccessorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "EnchantRandomlyFunctionAccessorMixin",
+    "EnchantWithLevelsFunctionAccessorMixin",
+    "LootItemAccessorMixin",
+    "LootPoolSingletonContainerAccessorMixin",
+    "SetEnchantmentsFunctionAccessorMixin",
+    "SetItemCountFunctionAccessorMixin",
+    "SetPotionFunctionAccessorMixin",
+    "SheepAccessorMixin"
+  ],
+  "server": [
+  ]
+}
