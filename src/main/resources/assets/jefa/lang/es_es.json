@@ -1,0 +1,23 @@
+{
+  "jefa.category.piglin_trade": "Trueque con Piglin",
+  "jefa.category.vault_loot": "Botín de Arca",
+  "jefa.category.trial_spawner_loot": "Botín de Desafío",
+  "jefa.category.cat_gift": "Regalo Felino Mañanero",
+
+  "jefa.lore.chance": "Posibilidad",
+  "jefa.lore.unknown_loot_function" : "Esta loot table está modificando datos del item que el mod no reconoce",
+  "jefa.lore.damaged": "El item puede aparecer dañado",
+  "jefa.lore.enchantment.random_level": "nivel aleatorio",
+  "jefa.lore.enchantment.add": "puede tener más encantamientos",
+  "jefa.lore.quantity.random": "Cantidad aleatoria",
+  "jefa.lore.quantity": "Cantidad",
+  "jefa.lore.enchantment.random": "Encantamiento aleatorio",
+  "jefa.lore.enchantment.level": "nivel",
+  "jefa.lore.enchantment.random_valid": "cualquier valido",
+  "jefa.lore.literal.between": "entre",
+  "jefa.lore.ominous_amplifier": "Efecto de mal presagio",
+  "jefa.category.fishing_loot": "Botín de Pesca (Sin Suerte Marina)",
+  "jefa.lore.enchantment.max_level": "nivel máximo",
+  "jefa.category.mob_interaction": "Interacción con Criaturas",
+  "jefa.category.hero_loot": "Regalos al Héroe de la Aldea"
+}
