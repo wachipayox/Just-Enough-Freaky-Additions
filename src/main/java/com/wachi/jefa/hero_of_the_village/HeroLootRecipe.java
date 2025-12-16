@@ -7,6 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.neoforge.common.extensions.IHolderExtension;
 import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
@@ -14,7 +15,7 @@ import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import java.util.ArrayList;
 import java.util.List;
 
-public record HeroLootRecipe(VillagerProfession profession, PoiType workSite, ResourceKey<LootTable> giftsTable) {
+public record HeroLootRecipe(VillagerProfession profession, boolean baby, PoiType workSite, ResourceKey<LootTable> giftsTable) {
 
     public static List<HeroLootRecipe> recipes = new ArrayList<>(){{
         RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
@@ -26,13 +27,16 @@ public record HeroLootRecipe(VillagerProfession profession, PoiType workSite, Re
                 if(data != null)
                     registryAccess.lookupOrThrow(Registries.POINT_OF_INTEREST_TYPE).listElements()
                             .filter(h.value().heldJobSite()).findAny().ifPresent(
-                                    jobSite -> add(fabric(h.value(), jobSite.value(), data.lootTable())
+                                    jobSite -> add(fabric(h.value(), false, jobSite.value(), data.lootTable())
                                     ));
             } catch (Exception ignored){}
         }
+
+        add(fabric(VillagerProfession.NONE, false, null, BuiltInLootTables.UNEMPLOYED_GIFT));
+        add(fabric(VillagerProfession.NONE, true, null, BuiltInLootTables.BABY_VILLAGER_GIFT));
     }};
 
-    private static HeroLootRecipe fabric(VillagerProfession profession, PoiType workSiteId, ResourceKey<LootTable> gift){
-        return new HeroLootRecipe(profession, workSiteId, gift);
+    private static HeroLootRecipe fabric(VillagerProfession profession, boolean baby, PoiType workSiteId, ResourceKey<LootTable> gift){
+        return new HeroLootRecipe(profession, baby, workSiteId, gift);
     }
 }

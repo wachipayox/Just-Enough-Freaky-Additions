@@ -7,7 +7,7 @@ import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.library.gui.elements.DrawableBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
 
-    public static final RecipeType<CatGift> recipeType = RecipeType.create(JEFA.MODID, "cat_gift", CatGift.class);
+    public static final IRecipeType<CatGift> recipeType = IRecipeType.create(JEFA.MODID, "cat_gift", CatGift.class);
 
     final IDrawable icon2;
 
@@ -31,7 +31,7 @@ public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
     }
 
     @Override
-    public RecipeType<CatGift> getRecipeType() {
+    public IRecipeType<CatGift> getRecipeType() {
         return recipeType;
     }
 
@@ -60,7 +60,7 @@ public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
         for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 BuiltInLootTables.CAT_MORNING_GIFT.location()
         ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
+            builder.addOutputSlot().add(itemStack);
         }
     }
 }

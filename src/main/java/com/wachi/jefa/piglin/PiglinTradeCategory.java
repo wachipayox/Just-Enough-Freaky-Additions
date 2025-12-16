@@ -11,7 +11,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -29,14 +29,14 @@ import org.joml.Quaternionf;
 
 public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
-    public static final RecipeType<PiglinTrade> recipeType = RecipeType.create(JEFA.MODID, "piglin_trade", PiglinTrade.class);
+    public static final IRecipeType<PiglinTrade> recipeType = IRecipeType.create(JEFA.MODID, "piglin_trade", PiglinTrade.class);
 
     public PiglinTradeCategory(IGuiHelper guiHelper){
         super(guiHelper, Items.PIGLIN_HEAD.getDefaultInstance(), 6, 200, 100, 5);
     }
 
     @Override
-    public RecipeType<PiglinTrade> getRecipeType() {
+    public IRecipeType<PiglinTrade> getRecipeType() {
         return recipeType;
     }
 
@@ -57,7 +57,7 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PiglinTrade recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).addIngredient(
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).add(
                 VanillaTypes.ITEM_STACK,
                 Items.GOLD_INGOT.getDefaultInstance()
         );
@@ -65,7 +65,7 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
         for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.PIGLIN_BARTERING.location())
                 .stream().map(LootEntryPreviewBuilder.PreviewResult::stack)
                 .toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
+            builder.addOutputSlot().add(itemStack);
         }
 
     }
@@ -125,7 +125,7 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
         dispatcher.setRenderShadow(false);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        dispatcher.render(globalPiglin, 0.0, 0.0, 0.0, 0.0F, 0, poseStack, bufferSource, 0x00F000F0);
+        dispatcher.render(globalPiglin, 0.0, 0.0, 0.0, 0.0F, poseStack, bufferSource, 0x00F000F0);
         bufferSource.endBatch();
         dispatcher.setRenderShadow(true);
 

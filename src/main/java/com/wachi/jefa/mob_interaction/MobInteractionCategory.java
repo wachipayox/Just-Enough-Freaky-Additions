@@ -9,8 +9,8 @@ import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.library.gui.elements.DrawableBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class MobInteractionCategory implements IRecipeCategory<MobInteractionRecipe> {
 
-    public static final RecipeType<MobInteractionRecipe> recipeType = RecipeType.create(JEFA.MODID, "mob_interaction", MobInteractionRecipe.class);
+    public static final IRecipeType<MobInteractionRecipe> recipeType = IRecipeType.create(JEFA.MODID, "mob_interaction", MobInteractionRecipe.class);
 
     protected final IDrawable background;
     protected final IDrawable icon;
@@ -55,7 +55,7 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
     }
 
     @Override
-    public RecipeType<MobInteractionRecipe> getRecipeType() {
+    public IRecipeType<MobInteractionRecipe> getRecipeType() {
         return recipeType;
     }
 
@@ -71,20 +71,29 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, MobInteractionRecipe recipe, IFocusGroup focuses) {
+        var level = Minecraft.getInstance().level;
+        if(level == null) return;
+
         if(recipe.mobIn() != null)
             builder.addInvisibleIngredients(RecipeIngredientRole.INPUT)
-                    .addIngredient(VanillaTypes.ITEM_STACK, recipe.mobIn().apply(Minecraft.getInstance().level).second);
+                    .add(recipe.mobIn().apply(level).second);
         else if(recipe.itemIn() != null)
             builder.addSlot(RecipeIngredientRole.INPUT, 10, 4)
-                    .addIngredient(VanillaTypes.ITEM_STACK, recipe.itemIn());
+                    .add(recipe.itemIn());
 
         if(recipe.mobMid() != null)
-            builder.addInvisibleIngredients(RecipeIngredientRole.CATALYST)
-                    .addIngredient(VanillaTypes.ITEM_STACK, recipe.mobMid().apply(Minecraft.getInstance().level).second);
+            builder.addInvisibleIngredients(RecipeIngredientRole.CRAFTING_STATION)
+                    .add(recipe.mobMid().apply(level).second);
 
         if(recipe.itemOut() != null)
             builder.addSlot(RecipeIngredientRole.OUTPUT, 74, 4)
-                    .addIngredient(VanillaTypes.ITEM_STACK, recipe.itemOut());
+                    .add(recipe.itemOut());
+        else if(recipe.itemOutFunction() != null && recipe.mobMid() != null) {
+            var e = recipe.mobMid().apply(level).first;
+
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 74, 4)
+                    .addIngredients(VanillaTypes.ITEM_STACK, recipe.itemOutFunction().apply(e));
+        }
     }
 
     //Storaging entities so if there is a resource pack like fresh animations the animations can set up
@@ -130,7 +139,7 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
         dispatcher.setRenderShadow(false);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        dispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, 0, poseStack, bufferSource, 0x00F000F0);
+        dispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, poseStack, bufferSource, 0x00F000F0);
 
         bufferSource.endBatch();
         dispatcher.setRenderShadow(true);

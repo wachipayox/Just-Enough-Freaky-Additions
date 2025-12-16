@@ -1,7 +1,5 @@
 package com.wachi.jefa.mixins;
 
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import org.spongepowered.asm.mixin.Mixin;

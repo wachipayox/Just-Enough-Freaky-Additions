@@ -1,12 +1,15 @@
 package com.wachi.jefa;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.wachi.jefa.mixins.GuiGraphicsAccessorMixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Quaternionf;
 
 public class RenderUtil {
@@ -26,7 +29,7 @@ public class RenderUtil {
         pose.mulPose(new Quaternionf().rotateX((float) Math.toRadians(-15)));
         pose.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(-15)));
 
-        brd.renderSingleBlock(state, pose, gg.bufferSource(), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        brd.renderSingleBlock(state, pose, ((GuiGraphicsAccessorMixin)gg).getBufferSource(), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, (RenderType)null);
         gg.flush();
         pose.popPose();
     }

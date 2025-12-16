@@ -68,6 +68,7 @@ public class JEFA {
     }
 
     public static List<ResourceKey<LootTable>> toSync = new ArrayList<>(){{
+        //Main loot tables
         add(BuiltInLootTables.PIGLIN_BARTERING);
         add(BuiltInLootTables.TRIAL_CHAMBERS_REWARD);
         add(BuiltInLootTables.TRIAL_CHAMBERS_REWARD_OMINOUS);
@@ -75,6 +76,15 @@ public class JEFA {
         add(BuiltInLootTables.CAT_MORNING_GIFT);
         add(JefaLootTables.TRIAL_SPAWNER);
         add(JefaLootTables.TRIAL_SPAWNER_OMINOUS);
+
+        //Mob interaction
+        BuiltInLootTables.SHEAR_SHEEP_BY_DYE.forEach((k, v) -> add(v));
+        add(BuiltInLootTables.ARMADILLO_SHED);
+        add(BuiltInLootTables.CHICKEN_LAY);
+
+        //Hero of the Village without job
+        add(BuiltInLootTables.BABY_VILLAGER_GIFT);
+        add(BuiltInLootTables.UNEMPLOYED_GIFT);
     }};
 
     @SubscribeEvent

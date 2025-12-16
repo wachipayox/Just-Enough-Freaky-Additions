@@ -7,12 +7,13 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.OminousBottleAmplifier;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TrialSpawnerBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,14 +23,14 @@ import java.util.ArrayList;
 
 public class TrialSpawnerCategory extends AbstractJefaCategory<TrialSpawnerLoot> {
 
-    public static final RecipeType<TrialSpawnerLoot> recipeType = RecipeType.create(JEFA.MODID, "trial_spawner_loot", TrialSpawnerLoot.class);
+    public static final IRecipeType<TrialSpawnerLoot> recipeType = IRecipeType.create(JEFA.MODID, "trial_spawner_loot", TrialSpawnerLoot.class);
 
     public TrialSpawnerCategory(IGuiHelper guiHelper){
         super(guiHelper, Items.TRIAL_SPAWNER.getDefaultInstance(), 6, 200, 84, 4);
     }
 
     @Override
-    public RecipeType<TrialSpawnerLoot> getRecipeType() {
+    public IRecipeType<TrialSpawnerLoot> getRecipeType() {
         return recipeType;
     }
 
@@ -57,7 +58,7 @@ public class TrialSpawnerCategory extends AbstractJefaCategory<TrialSpawnerLoot>
                             new ArrayList<>() {{
                                 for (int f = 0; f < 5; f++) {
                                     var potion = Items.OMINOUS_BOTTLE.getDefaultInstance();
-                                    potion.set(DataComponents.OMINOUS_BOTTLE_AMPLIFIER, f);
+                                    potion.set(DataComponents.OMINOUS_BOTTLE_AMPLIFIER, new OminousBottleAmplifier(f));
                                     add(potion);}}});
 
         for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
@@ -65,7 +66,7 @@ public class TrialSpawnerCategory extends AbstractJefaCategory<TrialSpawnerLoot>
                         ? JefaLootTables.TRIAL_SPAWNER_OMINOUS.location()
                         : JefaLootTables.TRIAL_SPAWNER.location()
         ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
+            builder.addOutputSlot().add(itemStack);
         }
     }
 

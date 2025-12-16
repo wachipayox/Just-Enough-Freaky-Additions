@@ -4,13 +4,12 @@ import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
 import com.wachi.jefa.RenderUtil;
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -23,14 +22,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
 
-    public static final RecipeType<VaultLoot> recipeType = RecipeType.create(JEFA.MODID, "vault_loot", VaultLoot.class);
+    public static final IRecipeType<VaultLoot> recipeType = IRecipeType.create(JEFA.MODID, "vault_loot", VaultLoot.class);
 
     public VaultOpeningCategory(IGuiHelper guiHelper){
         super(guiHelper, Items.VAULT.getDefaultInstance(), 6, 200, 84, 4);
     }
 
     @Override
-    public RecipeType<VaultLoot> getRecipeType() {
+    public IRecipeType<VaultLoot> getRecipeType() {
         return recipeType;
     }
 
@@ -51,8 +50,7 @@ public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, VaultLoot recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).addIngredient(
-                VanillaTypes.ITEM_STACK,
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).add(
                 recipe.ominous()
                         ? Items.OMINOUS_TRIAL_KEY.getDefaultInstance()
                         : Items.TRIAL_KEY.getDefaultInstance()
@@ -63,7 +61,7 @@ public class VaultOpeningCategory extends AbstractJefaCategory<VaultLoot> {
                         ? BuiltInLootTables.TRIAL_CHAMBERS_REWARD_OMINOUS.location()
                         : BuiltInLootTables.TRIAL_CHAMBERS_REWARD.location()
         ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
+            builder.addOutputSlot().add(itemStack);
         }
     }
 

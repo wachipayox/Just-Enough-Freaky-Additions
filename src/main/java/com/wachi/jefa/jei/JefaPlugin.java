@@ -63,12 +63,12 @@ public class JefaPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(Items.PIGLIN_SPAWN_EGG.getDefaultInstance(), PiglinTradeCategory.recipeType);
-        registration.addRecipeCatalyst(Items.VAULT.getDefaultInstance(), VaultOpeningCategory.recipeType);
-        registration.addRecipeCatalyst(Items.TRIAL_SPAWNER.getDefaultInstance(), TrialSpawnerCategory.recipeType);
-        registration.addRecipeCatalyst(Items.FISHING_ROD.getDefaultInstance(), FishingCategory.recipeType);
-        registration.addRecipeCatalyst(Items.CAT_SPAWN_EGG.getDefaultInstance(), CatGiftCategory.recipeType);
-        registration.addRecipeCatalyst(Items.VILLAGER_SPAWN_EGG.getDefaultInstance(), HeroLootCategory.recipeType);
+        registration.addCraftingStation(PiglinTradeCategory.recipeType, Items.PIGLIN_SPAWN_EGG.getDefaultInstance());
+        registration.addCraftingStation(VaultOpeningCategory.recipeType, Items.VAULT.getDefaultInstance());
+        registration.addCraftingStation(TrialSpawnerCategory.recipeType, Items.TRIAL_SPAWNER.getDefaultInstance());
+        registration.addCraftingStation(FishingCategory.recipeType, Items.FISHING_ROD.getDefaultInstance());
+        registration.addCraftingStation(CatGiftCategory.recipeType, Items.CAT_SPAWN_EGG.getDefaultInstance());
+        registration.addCraftingStation(HeroLootCategory.recipeType, Items.VILLAGER_SPAWN_EGG.getDefaultInstance());
     }
 
 

@@ -11,7 +11,7 @@ import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.library.gui.elements.DrawableBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
-    public static final RecipeType<HeroLootRecipe> recipeType = RecipeType.create(JEFA.MODID, "hero_loot", HeroLootRecipe.class);
+    public static final IRecipeType<HeroLootRecipe> recipeType = IRecipeType.create(JEFA.MODID, "hero_loot", HeroLootRecipe.class);
     protected final IDrawable icon2;
 
     public HeroLootCategory(IGuiHelper guiHelper){
@@ -61,7 +61,7 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
     }
 
     @Override
-    public RecipeType<HeroLootRecipe> getRecipeType() {
+    public IRecipeType<HeroLootRecipe> getRecipeType() {
         return recipeType;
     }
 
@@ -72,15 +72,16 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, HeroLootRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 15, 9).addIngredients(
-                VanillaTypes.ITEM_STACK,
-                recipe.workSite().matchingStates().stream().map(bs -> bs.getBlock().asItem().getDefaultInstance()).toList()
-        );
+        if(recipe.workSite() != null)
+            builder.addSlot(RecipeIngredientRole.INPUT, 15, 9).addIngredients(
+                    VanillaTypes.ITEM_STACK,
+                    recipe.workSite().matchingStates().stream().map(bs -> bs.getBlock().asItem().getDefaultInstance()).toList()
+            );
 
         for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 recipe.giftsTable().location()
         ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
+            builder.addOutputSlot().add(itemStack);
         }
 
     }
@@ -100,6 +101,7 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
         var villager = villagers.computeIfAbsent(recipe, k -> {
             var v = new Villager(EntityType.VILLAGER, mc.level);
             v.setVillagerData(new VillagerData(VillagerType.PLAINS, k.profession(), 0));
+            v.setBaby(recipe.baby());
             return v;
         });
 
