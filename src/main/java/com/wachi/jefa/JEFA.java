@@ -161,7 +161,7 @@ public class JEFA {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void registerNetworking(final RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar(MODID);
+        final PayloadRegistrar registrar = event.registrar(MODID).optional();
         MESSAGES.forEach((id, networkMessage) -> registrar.playBidirectional(id, ((NetworkMessage) networkMessage).reader(), ((NetworkMessage) networkMessage).handler()));
         networkingRegistered = true;
     }
