@@ -1,7 +1,6 @@
 package com.wachi.jefa;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
@@ -38,8 +37,10 @@ public final class ClientLootTableReader {
         List<LootPool> r = new ArrayList<>();
         mc.getResourceManager().getResource(res).ifPresent(resource -> {
             try (Reader reader = resource.openAsReader()) {
-                JsonObject json = GsonHelper.parse(reader);
-                r.addAll(receivedLootTableFromServer(id, json.toString()));
+                LootTable table = parseFromJson(id, GsonHelper.parse(reader));
+                if(table != null) {
+                    r.addAll(extractPools(table));
+                }
             } catch (Exception e) {
                 JEFA.LOGGER.error("Error parsing client data file {}. Error: {}", res, e.getMessage());
             }
@@ -51,30 +52,32 @@ public final class ClientLootTableReader {
         return id.getNamespace() + "/loot_table/" + id.getPath() + ".json";
     }
 
-    public static List<LootPool> receivedLootTableFromServer(ResourceLocation id, String jsonString) {
-        List<LootPool> r = new ArrayList<>();
+    public static LootTable parseFromJson(ResourceLocation id, JsonElement json){
+        if (Minecraft.getInstance().level == null) return null;
+        RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
+        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
+
+        DataResult<LootTable> parsed =
+                LootTable.DIRECT_CODEC.parse(ops, json);
+
+        return parsed.resultOrPartial(
+                msg -> JEFA.LOGGER.error("Failed to parse loot table {}: {}", id, msg)
+        ).orElse(null);
+    }
+
+    public static void receivedLootTableFromServer(ResourceLocation id, String jsonString) {
         try {
-            JsonElement json = JsonParser.parseString(jsonString);
-
-            RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-            RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
-
-            DataResult<LootTable> parsed =
-                    LootTable.DIRECT_CODEC.parse(ops, json);
-
-            parsed.resultOrPartial(
-                    msg -> JEFA.LOGGER.error("Failed to parse loot table {}: {}", id, msg)
-                    ).ifPresent(table -> r.addAll(extractPools(id, table)));
+            LootTable table = parseFromJson(id, JsonParser.parseString(jsonString));
+            if(table != null) {
+                var pools = extractPools(table);
+                if (!pools.isEmpty()) synced_loot_tables.put(id, pools);
+            }
         } catch (Exception e) {
             JEFA.LOGGER.error("Error reading loot table {} from packet, reason: {}", id, e);
         }
-        return r;
     }
 
-    private static List<LootPool> extractPools(ResourceLocation id, LootTable table) {
-        List<LootPool> pools = ((LootTableAccessorMixin) table).getPools();
-
-        if(!pools.isEmpty()) synced_loot_tables.put(id, pools);
-        return pools;
+    private static List<LootPool> extractPools(LootTable table) {
+        return ((LootTableAccessorMixin) table).getPools();
     }
 }
