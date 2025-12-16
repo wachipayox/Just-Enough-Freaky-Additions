@@ -17,14 +17,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
@@ -80,13 +85,24 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
     }
 
+    public static Map<HeroLootRecipe, Entity> villagers = new HashMap<>();
+    public static Level lastLevel = null;
+
     @Override
     public void draw(HeroLootRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
-        var villager = new Villager(EntityType.VILLAGER, mc.level);
-        villager.setVillagerData(new VillagerData(VillagerType.PLAINS, recipe.profession(), 0));
+        else if(lastLevel == null || lastLevel != mc.level){
+            villagers.clear();
+            lastLevel = mc.level;
+        }
+        var villager = villagers.computeIfAbsent(recipe, k -> {
+            var v = new Villager(EntityType.VILLAGER, mc.level);
+            v.setVillagerData(new VillagerData(VillagerType.PLAINS, k.profession(), 0));
+            return v;
+        });
+
         MobInteractionCategory.renderEntity(guiGraphics, villager, 10, 24, 12, mouseX, mouseY);
     }
 

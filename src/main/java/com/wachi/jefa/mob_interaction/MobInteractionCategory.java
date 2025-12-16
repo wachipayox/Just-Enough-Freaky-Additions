@@ -19,9 +19,13 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MobInteractionCategory implements IRecipeCategory<MobInteractionRecipe> {
@@ -83,19 +87,29 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
                     .addIngredient(VanillaTypes.ITEM_STACK, recipe.itemOut());
     }
 
+    //Storaging entities so if there is a resource pack like fresh animations the animations can set up
+    public static Map<MobInteractionRecipe, Entity> inMobs = new HashMap<>();
+    public static Map<MobInteractionRecipe, Entity> midMobs = new HashMap<>();
+    public static Level lastLevel = null;
+
     @Override
     public void draw(MobInteractionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         IRecipeCategory.super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
-
         background.draw(guiGraphics);
 
-        if(Minecraft.getInstance().level == null) return;
+        var level = Minecraft.getInstance().level;
+        if(level == null) return;
+        else if(lastLevel == null || lastLevel != level){
+            inMobs.clear();
+            midMobs.clear();
+            lastLevel = level;
+        }
 
         if(recipe.mobIn() != null) {
-            var mobIn = recipe.mobIn().apply(Minecraft.getInstance().level).first;
+            var mobIn = inMobs.computeIfAbsent(recipe, k -> recipe.mobIn().apply(level).first);
             renderEntity(guiGraphics, mobIn, 18, 18, (float) (12 / Math.max(mobIn.getBoundingBox().getSize(), 0.55)), mouseX, mouseY);
         }if(recipe.mobMid() != null) {
-            var mobMid = recipe.mobMid().apply(Minecraft.getInstance().level).first;
+            var mobMid = midMobs.computeIfAbsent(recipe, k -> recipe.mobMid().apply(level).first);
             renderEntity(guiGraphics, mobMid, 50, 18, (float) (12 / Math.max(mobMid.getBoundingBox().getSize(), 0.55)), mouseX, mouseY);
         }
     }
@@ -117,10 +131,9 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
         dispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, 0, poseStack, bufferSource, 0x00F000F0);
+
         bufferSource.endBatch();
         dispatcher.setRenderShadow(true);
-
         poseStack.popPose();
     }
-
 }
