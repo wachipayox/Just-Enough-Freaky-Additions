@@ -1,7 +1,5 @@
 package com.wachi.jefa.hero_of_the_village;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
@@ -14,38 +12,25 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.common.gui.elements.DrawableBlank;
-import mezz.jei.common.gui.elements.DrawableSprite;
-import mezz.jei.common.gui.textures.JeiSpriteUploader;
 import mezz.jei.library.gui.elements.DrawableBuilder;
-import mezz.jei.library.runtime.JeiHelpers;
-import mezz.jei.library.runtime.JeiRuntime;
-import mezz.jei.neoforge.JustEnoughItems;
-import mezz.jei.neoforge.JustEnoughItemsClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
@@ -103,13 +88,24 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
         }
     }
 
+    public static Map<HeroLootRecipe, Entity> villagers = new HashMap<>();
+    public static Level lastLevel = null;
+
     @Override
     public void draw(HeroLootRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
-        var villager = new Villager(EntityType.VILLAGER, mc.level);
-        villager.setVillagerData(new VillagerData(VillagerType.PLAINS, recipe.profession(), 0));
+        else if(lastLevel == null || lastLevel != mc.level){
+            villagers.clear();
+            lastLevel = mc.level;
+        }
+        var villager = villagers.computeIfAbsent(recipe, k -> {
+            var v = new Villager(EntityType.VILLAGER, mc.level);
+            v.setVillagerData(new VillagerData(VillagerType.PLAINS, k.profession(), 0));
+            return v;
+        });
+
         MobInteractionCategory.renderEntity(guiGraphics, villager, 10, 24, 12, mouseX, mouseY);
     }
 

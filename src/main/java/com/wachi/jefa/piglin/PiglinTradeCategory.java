@@ -22,6 +22,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
@@ -61,13 +62,11 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
         }
     }
 
-    @Override
-    public void draw(PiglinTrade recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
-        if(Minecraft.getInstance().level == null) return;
-        Minecraft mc = Minecraft.getInstance();
+    public static Piglin globalPiglin = null;
+    public static Level lastLevel = null;
 
-        Piglin piglin = new Piglin(EntityType.PIGLIN, mc.level);
+    private static Piglin generatePiglin(Level level){
+        Piglin piglin = new Piglin(EntityType.PIGLIN, level);
         piglin.setBaby(false);
         piglin.setAggressive(false);
         piglin.setImmuneToZombification(true);
@@ -87,6 +86,20 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
         piglin.setXRot(headPitch);
         piglin.xRotO = headPitch;
 
+        return piglin;
+    }
+
+    @Override
+    public void draw(PiglinTrade recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        super.draw(recipe, recipeSlotsView, guiGraphics, mouseX, mouseY);
+        var level = Minecraft.getInstance().level;
+        if(level == null) return;
+        else if(lastLevel == null || lastLevel != level || globalPiglin == null){
+            globalPiglin = generatePiglin(level);
+            lastLevel = level;
+        }
+
+        Minecraft mc = Minecraft.getInstance();
         int x = 45;
         int y = 90;
         float scale = 35.0F;
@@ -103,7 +116,7 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
         dispatcher.setRenderShadow(false);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-        dispatcher.render(piglin, 0.0, 0.0, 0.0, 0.0F, 0, poseStack, bufferSource, 0x00F000F0);
+        dispatcher.render(globalPiglin, 0.0, 0.0, 0.0, 0.0F, 0, poseStack, bufferSource, 0x00F000F0);
         bufferSource.endBatch();
         dispatcher.setRenderShadow(true);
 
