@@ -100,7 +100,7 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
         }
         var villager = villagers.computeIfAbsent(recipe, k -> {
             var v = new Villager(EntityType.VILLAGER, mc.level);
-            v.setVillagerData(new VillagerData(VillagerType.PLAINS, k.profession(), 0));
+            v.setVillagerData(new VillagerData(lastLevel.registryAccess().holderOrThrow(VillagerType.PLAINS), lastLevel.registryAccess().holderOrThrow(k.profession()), 0));
             v.setBaby(recipe.baby());
             return v;
         });

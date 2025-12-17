@@ -80,7 +80,6 @@ public class JEFA {
         //Mob interaction
         BuiltInLootTables.SHEAR_SHEEP_BY_DYE.forEach((k, v) -> add(v));
         add(BuiltInLootTables.ARMADILLO_SHED);
-        add(BuiltInLootTables.CHICKEN_LAY);
 
         //Hero of the Village without job
         add(BuiltInLootTables.BABY_VILLAGER_GIFT);

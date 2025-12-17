@@ -15,7 +15,7 @@ import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import java.util.ArrayList;
 import java.util.List;
 
-public record HeroLootRecipe(VillagerProfession profession, boolean baby, PoiType workSite, ResourceKey<LootTable> giftsTable) {
+public record HeroLootRecipe(ResourceKey<VillagerProfession> profession, boolean baby, PoiType workSite, ResourceKey<LootTable> giftsTable) {
 
     public static List<HeroLootRecipe> recipes = new ArrayList<>(){{
         RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
@@ -27,7 +27,7 @@ public record HeroLootRecipe(VillagerProfession profession, boolean baby, PoiTyp
                 if(data != null)
                     registryAccess.lookupOrThrow(Registries.POINT_OF_INTEREST_TYPE).listElements()
                             .filter(h.value().heldJobSite()).findAny().ifPresent(
-                                    jobSite -> add(fabric(h.value(), false, jobSite.value(), data.lootTable())
+                                    jobSite -> add(fabric(h.getKey(), false, jobSite.value(), data.lootTable())
                                     ));
             } catch (Exception ignored){}
         }
@@ -36,7 +36,7 @@ public record HeroLootRecipe(VillagerProfession profession, boolean baby, PoiTyp
         add(fabric(VillagerProfession.NONE, true, null, BuiltInLootTables.BABY_VILLAGER_GIFT));
     }};
 
-    private static HeroLootRecipe fabric(VillagerProfession profession, boolean baby, PoiType workSiteId, ResourceKey<LootTable> gift){
+    private static HeroLootRecipe fabric(ResourceKey<VillagerProfession> profession, boolean baby, PoiType workSiteId, ResourceKey<LootTable> gift){
         return new HeroLootRecipe(profession, baby, workSiteId, gift);
     }
 }

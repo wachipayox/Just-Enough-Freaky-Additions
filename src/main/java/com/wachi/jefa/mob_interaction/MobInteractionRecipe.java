@@ -2,7 +2,8 @@ package com.wachi.jefa.mob_interaction;
 
 import com.ibm.icu.impl.Pair;
 import com.wachi.jefa.LootEntryPreviewBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.wachi.jefa.mixins.EntityAccessorMixin;
+import com.wachi.jefa.mixins.FrogAccessorMixin;
 import net.minecraft.data.loot.packs.LootData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
@@ -10,8 +11,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.animal.frog.Frog;
+import net.minecraft.world.entity.animal.frog.FrogVariant;
+import net.minecraft.world.entity.animal.frog.FrogVariants;
+import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.variant.VariantUtils;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -38,16 +43,12 @@ public record MobInteractionRecipe(
                 (level) -> Pair.of(new MushroomCow(EntityType.MOOSHROOM, level), Items.MOOSHROOM_SPAWN_EGG.getDefaultInstance()),
                 null, Items.BUCKET.getDefaultInstance(), Items.MILK_BUCKET.getDefaultInstance(), null
         ));
+
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new MushroomCow(EntityType.MOOSHROOM, level), Items.MOOSHROOM_SPAWN_EGG.getDefaultInstance()),
                 null, Items.BOWL.getDefaultInstance(), Items.MUSHROOM_STEW.getDefaultInstance(), null
         ));
-        add(new MobInteractionRecipe(
-                (level) -> Pair.of(new Chicken(EntityType.CHICKEN, level), Items.CHICKEN_SPAWN_EGG.getDefaultInstance()),
-                null, null, null,
-                e -> LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.CHICKEN_LAY.location())
-                        .stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()
-        ));
+
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new Armadillo(EntityType.ARMADILLO, level), Items.ARMADILLO_SPAWN_EGG.getDefaultInstance()),
                 null, Items.BRUSH.getDefaultInstance(), null,
@@ -65,22 +66,35 @@ public record MobInteractionRecipe(
         ));
 
         add(new MobInteractionRecipe(
-                (level) -> Pair.of(getFrogVariant(FrogVariant.TEMPERATE, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
+                (level) -> Pair.of(getChickenVariant(ChickenVariants.TEMPERATE, level), Items.CHICKEN_SPAWN_EGG.getDefaultInstance()),
+                null, null, Items.EGG.getDefaultInstance(), null
+        ));
+        add(new MobInteractionRecipe(
+                (level) -> Pair.of(getChickenVariant(ChickenVariants.WARM, level), Items.CHICKEN_SPAWN_EGG.getDefaultInstance()),
+                null, null, Items.BROWN_EGG.getDefaultInstance(), null
+        ));
+        add(new MobInteractionRecipe(
+                (level) -> Pair.of(getChickenVariant(ChickenVariants.COLD, level), Items.CHICKEN_SPAWN_EGG.getDefaultInstance()),
+                null, null, Items.BLUE_EGG.getDefaultInstance(), null
+        ));
+
+        add(new MobInteractionRecipe(
+                (level) -> Pair.of(getFrogVariant(FrogVariants.TEMPERATE, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new Slime(EntityType.SLIME, level), Items.SLIME_SPAWN_EGG.getDefaultInstance()),
                 null, Items.SLIME_BALL.getDefaultInstance(), null
         ));
         add(new MobInteractionRecipe(
-                (level) -> Pair.of(getFrogVariant(FrogVariant.TEMPERATE, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
+                (level) -> Pair.of(getFrogVariant(FrogVariants.TEMPERATE, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new MagmaCube(EntityType.MAGMA_CUBE, level), Items.MAGMA_CUBE_SPAWN_EGG.getDefaultInstance()),
                 null, Items.OCHRE_FROGLIGHT.getDefaultInstance(), null
         ));
         add(new MobInteractionRecipe(
-                (level) -> Pair.of(getFrogVariant(FrogVariant.WARM, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
+                (level) -> Pair.of(getFrogVariant(FrogVariants.WARM, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new MagmaCube(EntityType.MAGMA_CUBE, level), Items.MAGMA_CUBE_SPAWN_EGG.getDefaultInstance()),
                 null, Items.PEARLESCENT_FROGLIGHT.getDefaultInstance(), null
         ));
         add(new MobInteractionRecipe(
-                (level) -> Pair.of(getFrogVariant(FrogVariant.COLD, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
+                (level) -> Pair.of(getFrogVariant(FrogVariants.COLD, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new MagmaCube(EntityType.MAGMA_CUBE, level), Items.MAGMA_CUBE_SPAWN_EGG.getDefaultInstance()),
                 null, Items.VERDANT_FROGLIGHT.getDefaultInstance(), null
         ));
@@ -106,9 +120,15 @@ public record MobInteractionRecipe(
         }
     }};
 
+    private static Chicken getChickenVariant(ResourceKey<ChickenVariant> variant, Level level){
+        var chicken = new Chicken(EntityType.CHICKEN, level);
+        chicken.setVariant(VariantUtils.getDefaultOrAny(level.registryAccess(), variant));
+        return chicken;
+    }
+
     private static Frog getFrogVariant(ResourceKey<FrogVariant> variant, Level level){
         var frog = new Frog(EntityType.FROG, level);
-        frog.setVariant(BuiltInRegistries.FROG_VARIANT.getOrThrow(variant));
+        ((EntityAccessorMixin)frog).getEntityData().set(((FrogAccessorMixin)frog).getFrogVariantData(), VariantUtils.getDefaultOrAny(level.registryAccess(), variant));
         return frog;
     }
 }

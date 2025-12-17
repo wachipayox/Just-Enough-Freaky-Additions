@@ -322,7 +322,7 @@ public final class LootEntryPreviewBuilder {
         Map<Holder<Enchantment>, NumberProvider> map = acc.getEnchantments();
         boolean add = acc.isAdd();
         map.keySet().stream().filter(
-                h -> h.value().canEnchant(stack)
+                stack::supportsEnchantment
         ).toList().forEach(map::remove);
 
         for (Map.Entry<Holder<Enchantment>, NumberProvider> e : map.entrySet()) {
@@ -380,7 +380,7 @@ public final class LootEntryPreviewBuilder {
         if (optSet.isPresent()) {
             HolderSet<Enchantment> set = optSet.get();
             List<String> names = new ArrayList<>();
-            for (Holder<Enchantment> h : set.stream().filter(h -> h.value().canEnchant(stack) || stack.getItem().equals(Items.BOOK) || stack.getItem().equals(Items.ENCHANTED_BOOK)).toList()) names.add(h.value().description().getString());
+            for (Holder<Enchantment> h : set.stream().filter(h -> stack.supportsEnchantment(h) || stack.getItem().equals(Items.BOOK) || stack.getItem().equals(Items.ENCHANTED_BOOK)).toList()) names.add(h.value().description().getString());
             names.sort(String.CASE_INSENSITIVE_ORDER);
             if (!names.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
@@ -408,7 +408,7 @@ public final class LootEntryPreviewBuilder {
 
         HolderSet<Enchantment> set = optSet.get();
         List<String> names = new ArrayList<>();
-        for (Holder<Enchantment> h : set.stream().filter(h -> h.value().canEnchant(stack) || stack.getItem().equals(Items.BOOK) || stack.getItem().equals(Items.ENCHANTED_BOOK)).toList()) names.add(h.value().description().getString());
+        for (Holder<Enchantment> h : set.stream().filter(h -> stack.supportsEnchantment(h) || stack.getItem().equals(Items.BOOK) || stack.getItem().equals(Items.ENCHANTED_BOOK)).toList()) names.add(h.value().description().getString());
 
         if (names.isEmpty()) {
             lore.add(Component.translatable("jefa.lore.enchantment.random"));
