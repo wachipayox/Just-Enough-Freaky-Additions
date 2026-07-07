@@ -30,7 +30,8 @@ import java.util.Map;
 
 public class MobInteractionCategory implements IRecipeCategory<MobInteractionRecipe> {
 
-    public static final RecipeType<MobInteractionRecipe> recipeType = RecipeType.create(JEFA.MODID, "mob_interaction", MobInteractionRecipe.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "mob_interaction");
+    public static final RecipeType<MobInteractionRecipe> recipeType = new RecipeType<>(id, MobInteractionRecipe.class);
 
     protected final IDrawable background;
     protected final IDrawable icon;
@@ -42,6 +43,11 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
         icon = new DrawableBuilder(ResourceLocation.fromNamespaceAndPath(
                 JEFA.MODID, "textures/gui/mob_int.png"
         ), 0, 0, 16, 16).setTextureSize(16, 16).build();
+    }
+
+    @Override
+    public @Nullable ResourceLocation getRegistryName(MobInteractionRecipe recipe) {
+        return id.withSuffix("_" + recipe.id());
     }
 
     @Override
@@ -106,10 +112,10 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
         }
 
         if(recipe.mobIn() != null) {
-            var mobIn = inMobs.computeIfAbsent(recipe, k -> recipe.mobIn().apply(level).first);
+            var mobIn = recipe.mobIn().apply(Minecraft.getInstance().level).first;
             renderEntity(guiGraphics, mobIn, 18, 18, (float) (12 / Math.max(mobIn.getBoundingBox().getSize(), 0.55)), mouseX, mouseY);
         }if(recipe.mobMid() != null) {
-            var mobMid = midMobs.computeIfAbsent(recipe, k -> recipe.mobMid().apply(level).first);
+            var mobMid = recipe.mobMid().apply(Minecraft.getInstance().level).first;
             renderEntity(guiGraphics, mobMid, 50, 18, (float) (12 / Math.max(mobMid.getBoundingBox().getSize(), 0.55)), mouseX, mouseY);
         }
     }
@@ -131,9 +137,10 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
         dispatcher.render(entity, 0.0, 0.0, 0.0, 0.0F, 0, poseStack, bufferSource, 0x00F000F0);
-
         bufferSource.endBatch();
         dispatcher.setRenderShadow(true);
+
         poseStack.popPose();
     }
+
 }

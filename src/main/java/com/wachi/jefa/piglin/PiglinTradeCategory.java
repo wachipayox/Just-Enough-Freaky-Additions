@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -25,11 +27,16 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+
+import java.util.List;
 
 public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
-    public static final RecipeType<PiglinTrade> recipeType = RecipeType.create(JEFA.MODID, "piglin_trade", PiglinTrade.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "piglin_trade");
+
+    public static final RecipeType<PiglinTrade> recipeType = new RecipeType<>(id, PiglinTrade.class);
 
     public PiglinTradeCategory(IGuiHelper guiHelper){
         super(guiHelper, Items.PIGLIN_HEAD.getDefaultInstance(), 6, 200, 100, 5);
@@ -41,9 +48,7 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
     }
 
     @Override
-    public @NotNull Component getTitle() {
-        return Component.translatable("jefa.category.piglin_trade");
-    }
+    public ResourceLocation getID(){return id;}
 
     @Override
     public int getGridX() {
@@ -56,18 +61,33 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
     }
 
     @Override
+    public @NotNull Component getTitle() {
+        return Component.translatable("jefa.category.piglin_trade");
+    }
+
+    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, PiglinTrade recipe, IFocusGroup focuses) {
         builder.addSlot(RecipeIngredientRole.INPUT, 10, 13).addIngredient(
                 VanillaTypes.ITEM_STACK,
                 Items.GOLD_INGOT.getDefaultInstance()
         );
 
-        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.PIGLIN_BARTERING.location())
-                .stream().map(LootEntryPreviewBuilder.PreviewResult::stack)
-                .toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
-        }
+        int x = getGridX(), y = getGridY(), i = 0;
 
+        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.PIGLIN_BARTERING.location()).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
+        for (ItemStack output : outputs) {
+            if(JEFA.emi_loaded && builder instanceof JemiRecipeLayoutBuilder subBuilder) {
+                subBuilder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
+                i++; x+=16;
+                if(i >= columns){
+                    x = getGridX(); i = 0; y+=16;
+                }
+            }
+            else
+                builder.addSlot(RecipeIngredientRole.OUTPUT)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
+        }
     }
 
     public static Piglin globalPiglin = null;
@@ -131,4 +151,5 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
         poseStack.popPose();
     }
+
 }

@@ -4,6 +4,7 @@ import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
 import com.wachi.jefa.mob_interaction.MobInteractionCategory;
+import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -24,16 +25,20 @@ import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
-    public static final RecipeType<HeroLootRecipe> recipeType = RecipeType.create(JEFA.MODID, "hero_loot", HeroLootRecipe.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "hero_loot");
+
+    public static final RecipeType<HeroLootRecipe> recipeType = new RecipeType<>(id,  HeroLootRecipe.class);
+
     protected final IDrawable icon2;
 
     public HeroLootCategory(IGuiHelper guiHelper){
@@ -43,6 +48,16 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
                 ResourceLocation.parse(
                         "textures/mob_effect/hero_of_the_village.png"),
                 0,  0, 18, 18).setTextureSize(18, 18).build();
+    }
+
+    @Override
+    public @Nullable IDrawable getIcon() {
+        return icon2;
+    }
+
+    @Override
+    public ResourceLocation getID() {
+        return id;
     }
 
     @Override
@@ -56,8 +71,8 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
     }
 
     @Override
-    public @Nullable IDrawable getIcon() {
-        return icon2;
+    public @Nullable ResourceLocation getRegistryName(@NotNull HeroLootRecipe recipe) {
+        return super.getRegistryName(recipe).withSuffix("_" + recipe.profession().name());
     }
 
     @Override
@@ -77,12 +92,24 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
                 recipe.workSite().matchingStates().stream().map(bs -> bs.getBlock().asItem().getDefaultInstance()).toList()
         );
 
-        for (ItemStack itemStack : LootEntryPreviewBuilder.buildPreviewsForLootTable(
-                recipe.giftsTable().location()
-        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList()) {
-            builder.addOutputSlot().addItemStack(itemStack);
-        }
+        int x = getGridX(), y = getGridY(), i = 0;
 
+        List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
+                recipe.giftsTable().location()
+        ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
+        for (ItemStack output : outputs) {
+            if(JEFA.emi_loaded && builder instanceof JemiRecipeLayoutBuilder subBuilder) {
+                subBuilder.addSlot(RecipeIngredientRole.OUTPUT, x, y)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
+                i++; x+=16;
+                if(i >= columns){
+                    x = getGridX(); i = 0; y+=16;
+                }
+            }
+            else
+                builder.addSlot(RecipeIngredientRole.OUTPUT)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
+        }
     }
 
     public static Map<HeroLootRecipe, Entity> villagers = new HashMap<>();

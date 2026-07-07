@@ -1,5 +1,7 @@
 package com.wachi.jefa.cat_gift;
 
-public record CatGift() {
+import com.wachi.AbstractJefaRecipe;
+
+public class CatGift extends AbstractJefaRecipe {
 
 }
