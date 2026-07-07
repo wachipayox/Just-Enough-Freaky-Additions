@@ -1,11 +1,11 @@
 package com.wachi.jefa.hero_of_the_village;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
 import com.wachi.jefa.mob_interaction.MobInteractionCategory;
+import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -14,42 +14,27 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.common.gui.elements.DrawableBlank;
-import mezz.jei.common.gui.elements.DrawableSprite;
-import mezz.jei.common.gui.textures.JeiSpriteUploader;
 import mezz.jei.library.gui.elements.DrawableBuilder;
-import mezz.jei.library.runtime.JeiHelpers;
-import mezz.jei.library.runtime.JeiRuntime;
-import mezz.jei.neoforge.JustEnoughItems;
-import mezz.jei.neoforge.JustEnoughItemsClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
-import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaternionf;
 
 import java.util.List;
 
 public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
 
-    public static final RecipeType<HeroLootRecipe> recipeType = RecipeType.create(JEFA.MODID, "hero_loot", HeroLootRecipe.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "hero_loot");
+
+    public static final RecipeType<HeroLootRecipe> recipeType = new RecipeType<>(id,  HeroLootRecipe.class);
 
     protected final IDrawable background2;
     protected final IDrawable icon2;
@@ -69,6 +54,16 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
     @Override
     public @Nullable IDrawable getIcon() {
         return icon2;
+    }
+
+    @Override
+    public ResourceLocation getID() {
+        return id;
+    }
+
+    @Override
+    public @Nullable ResourceLocation getRegistryName(@NotNull HeroLootRecipe recipe) {
+        return super.getRegistryName(recipe).withSuffix("_" + recipe.profession().name());
     }
 
     @Override
@@ -92,14 +87,25 @@ public class HeroLootCategory extends AbstractJefaCategory<HeroLootRecipe> {
                 VanillaTypes.ITEM_STACK,
                 recipe.workSite().matchingStates().stream().map(bs -> bs.getBlock().asItem().getDefaultInstance()).toList()
         );
-        scrollGridFactory.setPosition(36, 4);
+
+        int x = 36, y = 4, i = 0;
+        scrollGridFactory.setPosition(x, y);
 
         List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 recipe.giftsTable().location()
         ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
         for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+            if(JEFA.emi_loaded && builder instanceof JemiRecipeLayoutBuilder subBuilder) {
+                JemiRecipeSlotBuilder sB = (JemiRecipeSlotBuilder) subBuilder.addSlot(RecipeIngredientRole.OUTPUT, x, y);
+                sB.addIngredient(VanillaTypes.ITEM_STACK, output);
+                i++; x+=16;
+                if(!scrollGridFactory.getArea().containsPoint(x + 16, y)){
+                    x-=i*16; i = 0; y+=16;
+                }
+            }
+            else
+                builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
         }
     }
 

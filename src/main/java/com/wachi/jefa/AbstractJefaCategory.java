@@ -6,6 +6,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractJefaCategory<T> implements IRecipeCategory<T> {
@@ -18,6 +19,13 @@ public abstract class AbstractJefaCategory<T> implements IRecipeCategory<T> {
         background = guiHelper.createDrawable(ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "textures/gui/bg.png"), 0, 60, width, height);
         icon = guiHelper.createDrawableItemStack(iconItem);
         this.scrollGridFactory = guiHelper.createScrollGridFactory(columns, visibleRows);
+    }
+
+    public abstract ResourceLocation getID();
+
+    @Override
+    public @Nullable ResourceLocation getRegistryName(@NotNull T recipe) {
+        return getID().withSuffix("_main");
     }
 
     @Override

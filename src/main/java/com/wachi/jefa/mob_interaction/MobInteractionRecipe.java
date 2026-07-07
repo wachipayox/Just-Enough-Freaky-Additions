@@ -23,28 +23,34 @@ public record MobInteractionRecipe(
         Function<Level, Pair<Entity, ItemStack>> mobMid,
         Function<Level, Pair<Entity, ItemStack>> mobIn,
         ItemStack itemIn,
-        ItemStack itemOut
+        ItemStack itemOut,
+        String id
 ){
     public static List<MobInteractionRecipe> recipes = new ArrayList<>(){{
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new Cow(EntityType.COW, level), Items.COW_SPAWN_EGG.getDefaultInstance()),
-                null, Items.BUCKET.getDefaultInstance(), Items.MILK_BUCKET.getDefaultInstance()
+                null, Items.BUCKET.getDefaultInstance(), Items.MILK_BUCKET.getDefaultInstance(),
+                "milk_cow"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new MushroomCow(EntityType.MOOSHROOM, level), Items.MOOSHROOM_SPAWN_EGG.getDefaultInstance()),
-                null, Items.BUCKET.getDefaultInstance(), Items.MILK_BUCKET.getDefaultInstance()
+                null, Items.BUCKET.getDefaultInstance(), Items.MILK_BUCKET.getDefaultInstance(),
+                "milk_mooshroom_cow"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new MushroomCow(EntityType.MOOSHROOM, level), Items.MOOSHROOM_SPAWN_EGG.getDefaultInstance()),
-                null, Items.BOWL.getDefaultInstance(), Items.MUSHROOM_STEW.getDefaultInstance()
+                null, Items.BOWL.getDefaultInstance(), Items.MUSHROOM_STEW.getDefaultInstance(),
+                "bowl_mooshroom_cow"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new Chicken(EntityType.CHICKEN, level), Items.CHICKEN_SPAWN_EGG.getDefaultInstance()),
-                null, null, Items.EGG.getDefaultInstance()
+                null, null, Items.EGG.getDefaultInstance(),
+                "egg_lay"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new Armadillo(EntityType.ARMADILLO, level), Items.ARMADILLO_SPAWN_EGG.getDefaultInstance()),
-                null, Items.BRUSH.getDefaultInstance(), Items.ARMADILLO_SCUTE.getDefaultInstance()
+                null, Items.BRUSH.getDefaultInstance(), Items.ARMADILLO_SCUTE.getDefaultInstance(),
+                "brush_armadillo"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(new Turtle(EntityType.TURTLE, level), Items.TURTLE_SPAWN_EGG.getDefaultInstance()),
@@ -53,28 +59,33 @@ public record MobInteractionRecipe(
                     turtle.setBaby(true);
                     return Pair.of(turtle, Items.TURTLE_SPAWN_EGG.getDefaultInstance());
                 },
-                null, Items.TURTLE_SCUTE.getDefaultInstance()
+                null, Items.TURTLE_SCUTE.getDefaultInstance(),
+                "turtle_growing"
         ));
 
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(getFrogVariant(FrogVariant.TEMPERATE, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new Slime(EntityType.SLIME, level), Items.SLIME_SPAWN_EGG.getDefaultInstance()),
-                null, Items.SLIME_BALL.getDefaultInstance()
+                null, Items.SLIME_BALL.getDefaultInstance(),
+                "any_frog_slime"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(getFrogVariant(FrogVariant.TEMPERATE, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new MagmaCube(EntityType.MAGMA_CUBE, level), Items.MAGMA_CUBE_SPAWN_EGG.getDefaultInstance()),
-                null, Items.OCHRE_FROGLIGHT.getDefaultInstance()
+                null, Items.OCHRE_FROGLIGHT.getDefaultInstance(),
+                "temperate_frog_magma"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(getFrogVariant(FrogVariant.WARM, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new MagmaCube(EntityType.MAGMA_CUBE, level), Items.MAGMA_CUBE_SPAWN_EGG.getDefaultInstance()),
-                null, Items.PEARLESCENT_FROGLIGHT.getDefaultInstance()
+                null, Items.PEARLESCENT_FROGLIGHT.getDefaultInstance(),
+                "warm_frog_magma"
         ));
         add(new MobInteractionRecipe(
                 (level) -> Pair.of(getFrogVariant(FrogVariant.COLD, level), Items.FROG_SPAWN_EGG.getDefaultInstance()),
                 (level) -> Pair.of(new MagmaCube(EntityType.MAGMA_CUBE, level), Items.MAGMA_CUBE_SPAWN_EGG.getDefaultInstance()),
-                null, Items.VERDANT_FROGLIGHT.getDefaultInstance()
+                null, Items.VERDANT_FROGLIGHT.getDefaultInstance(),
+                "cold_frog_magma"
         ));
 
         //sheep for each dye color
@@ -85,7 +96,8 @@ public record MobInteractionRecipe(
                         s.setColor(entry.getKey());
                         return Pair.of(s, Items.SHEEP_SPAWN_EGG.getDefaultInstance());
                     },
-                    null, Items.SHEARS.getDefaultInstance(), entry.getValue().asItem().getDefaultInstance()
+                    null, Items.SHEARS.getDefaultInstance(), entry.getValue().asItem().getDefaultInstance(),
+                    "sheep_whool_" + entry.getKey().getSerializedName()
             ));
         }
     }};

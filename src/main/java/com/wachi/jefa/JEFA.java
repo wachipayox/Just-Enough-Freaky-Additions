@@ -7,6 +7,7 @@ import com.wachi.jefa.mixins.LootPoolAccessorMixin;
 import com.wachi.jefa.mixins.LootTableAccessorMixin;
 import com.wachi.jefa.mixins.NestedLootTableAccessorMixin;
 import com.wachi.jefa.network.SendLootTable;
+import dev.emi.emi.api.EmiApi;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -26,6 +27,10 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.fml.javafmlmod.FMLModContainer;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.extensions.IHolderExtension;
@@ -56,6 +61,8 @@ public class JEFA {
     public static final String MODID = "jefa";
     public static final Logger LOGGER = LogUtils.getLogger();
 
+    public static boolean emi_loaded = false;
+
     private record NetworkMessage<T extends CustomPacketPayload>(StreamCodec<? extends FriendlyByteBuf, T> reader, IPayloadHandler<T> handler) {
     }
 
@@ -64,6 +71,7 @@ public class JEFA {
 
     public JEFA(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::registerNetworking);
+        modEventBus.addListener(this::onFmlLoadComplete);
         NeoForge.EVENT_BUS.register(this);
     }
 
@@ -76,6 +84,10 @@ public class JEFA {
         add(JefaLootTables.TRIAL_SPAWNER);
         add(JefaLootTables.TRIAL_SPAWNER_OMINOUS);
     }};
+
+    public void onFmlLoadComplete(FMLLoadCompleteEvent event){
+        emi_loaded = ModList.get().isLoaded("emi");
+    }
 
     @SubscribeEvent
     public void onServerStartedInitSubTables(ServerStartedEvent event){

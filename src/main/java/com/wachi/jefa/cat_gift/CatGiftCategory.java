@@ -3,6 +3,8 @@ package com.wachi.jefa.cat_gift;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -23,7 +25,8 @@ import java.util.List;
 
 public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
 
-    public static final RecipeType<CatGift> recipeType = RecipeType.create(JEFA.MODID, "cat_gift", CatGift.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "cat_gift");
+    public static final RecipeType<CatGift> recipeType = new RecipeType<>(id, CatGift.class);
 
     final IDrawable icon2;
 
@@ -40,6 +43,11 @@ public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
     }
 
     @Override
+    public ResourceLocation getID() {
+        return id;
+    }
+
+    @Override
     public @Nullable IDrawable getIcon() {
         return icon2;
     }
@@ -51,14 +59,26 @@ public class CatGiftCategory extends AbstractJefaCategory<CatGift> {
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, CatGift recipe, IFocusGroup focuses) {
-        scrollGridFactory.setPosition(3, 4);
+        int x = 3, y = 4, i = 0;
+        scrollGridFactory.setPosition(x, y);
 
         List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(
                 BuiltInLootTables.CAT_MORNING_GIFT.location()
         ).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
         for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+            if(JEFA.emi_loaded && builder instanceof JemiRecipeLayoutBuilder subBuilder) {
+                JemiRecipeSlotBuilder sB = (JemiRecipeSlotBuilder) subBuilder.addSlot(RecipeIngredientRole.OUTPUT, x, y);
+                sB.addIngredient(VanillaTypes.ITEM_STACK, output);
+                i++; x+=16;
+                if(!scrollGridFactory.getArea().containsPoint(x + 16, y)){
+                    x-=i*16; i = 0; y+=16;
+                }
+            }
+            else
+                builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
         }
     }
+
+
 }

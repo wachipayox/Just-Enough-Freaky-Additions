@@ -5,6 +5,8 @@ import com.mojang.math.Axis;
 import com.wachi.jefa.AbstractJefaCategory;
 import com.wachi.jefa.JEFA;
 import com.wachi.jefa.LootEntryPreviewBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeLayoutBuilder;
+import dev.emi.emi.jemi.impl.JemiRecipeSlotBuilder;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
@@ -17,6 +19,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -24,13 +27,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 
 import java.util.List;
 
 public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
 
-    public static final RecipeType<PiglinTrade> recipeType = RecipeType.create(JEFA.MODID, "piglin_trade", PiglinTrade.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "piglin_trade");
+
+    public static final RecipeType<PiglinTrade> recipeType = new RecipeType<>(id, PiglinTrade.class);
 
     public PiglinTradeCategory(IGuiHelper guiHelper){
         super(guiHelper, Items.PIGLIN_HEAD.getDefaultInstance(), 6, 200, 100, 5);
@@ -40,6 +46,9 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
     public RecipeType<PiglinTrade> getRecipeType() {
         return recipeType;
     }
+
+    @Override
+    public ResourceLocation getID(){return id;}
 
     @Override
     public @NotNull Component getTitle() {
@@ -52,12 +61,23 @@ public class PiglinTradeCategory extends AbstractJefaCategory<PiglinTrade> {
                 VanillaTypes.ITEM_STACK,
                 Items.GOLD_INGOT.getDefaultInstance()
         );
-        scrollGridFactory.setPosition(73, 5);
+
+        int x = 73, y = 5, i = 0;
+        scrollGridFactory.setPosition(x, y);
 
         List<ItemStack> outputs = LootEntryPreviewBuilder.buildPreviewsForLootTable(BuiltInLootTables.PIGLIN_BARTERING.location()).stream().map(LootEntryPreviewBuilder.PreviewResult::stack).toList();
         for (ItemStack output : outputs) {
-            builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
-                    .addIngredient(VanillaTypes.ITEM_STACK, output);
+            if(JEFA.emi_loaded && builder instanceof JemiRecipeLayoutBuilder subBuilder) {
+                JemiRecipeSlotBuilder sB = (JemiRecipeSlotBuilder) subBuilder.addSlot(RecipeIngredientRole.OUTPUT, x, y);
+                sB.addIngredient(VanillaTypes.ITEM_STACK, output);
+                i++; x+=16;
+                if(!scrollGridFactory.getArea().containsPoint(x + 16, y)){
+                    x-=i*16; i = 0; y+=16;
+                }
+            }
+            else
+                builder.addSlotToWidget(RecipeIngredientRole.OUTPUT, scrollGridFactory)
+                        .addIngredient(VanillaTypes.ITEM_STACK, output);
         }
     }
 
