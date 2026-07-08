@@ -30,7 +30,8 @@ import java.util.Map;
 
 public class MobInteractionCategory implements IRecipeCategory<MobInteractionRecipe> {
 
-    public static final RecipeType<MobInteractionRecipe> recipeType = RecipeType.create(JEFA.MODID, "mob_interaction", com.wachi.jefa.mob_interaction.MobInteractionRecipe.class);
+    public static final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JEFA.MODID, "mob_interaction");
+    public static final RecipeType<MobInteractionRecipe> recipeType = new RecipeType<>(id, MobInteractionRecipe.class);
 
     protected final IDrawable background;
     protected final IDrawable icon;
@@ -42,6 +43,11 @@ public class MobInteractionCategory implements IRecipeCategory<MobInteractionRec
         icon = new DrawableBuilder(ResourceLocation.fromNamespaceAndPath(
                 JEFA.MODID, "textures/gui/mob_int.png"
         ), 0, 0, 16, 16).setTextureSize(16, 16).build();
+    }
+
+    @Override
+    public @Nullable ResourceLocation getRegistryName(MobInteractionRecipe recipe) {
+        return id.withSuffix("_" + recipe.id());
     }
 
     @Override
